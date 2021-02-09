@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include <SoftwareSerial.h>
 #include <avr/sleep.h>
+#include <ShiftRegister74HC595.h>
 
 /*
    _____         _____ _____ _____ _____
@@ -21,6 +22,32 @@
 //#define FIVEBUTTONS
 
 static const uint32_t cardCookie = 322417479;
+
+//SevSeg Display
+const int numberOfShiftRegisters = 2; // number of shift registers attached in series
+int serialDataPin = 5; // DS
+int clockPin = 7; // SHCP
+int latchPin = 6; // STCP
+ShiftRegister74HC595<numberOfShiftRegisters> sevSeg(serialDataPin, clockPin, latchPin);
+
+uint8_t  numberB[] = {B11000000, //0
+                      B11111001, //1 
+                      B10100100, //2
+                      B10110000, //3 
+                      B10011001, //4
+                      B10010010, //5
+                      B10000010, //6
+                      B11111000, //7
+                      B10000000, //8
+                      B10010000 //9
+                     };
+
+void setSevSeg(int number){
+  int digit1=number % 10;
+  int digit2= (number/10) %10;
+  uint8_t numberToPrint[]= {numberB[digit2],numberB[digit1]};
+  sevSeg.setAll(numberToPrint); 
+}
 
 // DFPlayer Mini
 SoftwareSerial mySoftwareSerial(2, 3); // RX, TX
